@@ -1,9 +1,8 @@
-
 import mongoose from "mongoose";
 
 const ProfileSchema = new mongoose.Schema({
-  userId: String,
-  name: String,
+  userId: { type: String, required: true },
+  name: { type: String, required: true },
   age: Number,
   gender: String,
   height: String,
@@ -12,7 +11,7 @@ const ProfileSchema = new mongoose.Schema({
   education: String,
   occupation: String,
   salary: String,
-  address: String,
+  city: String,
   phone: String,
   about: String,
   image: String,
