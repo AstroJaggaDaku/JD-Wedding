@@ -1,9 +1,19 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route"; // Make sure you export authOptions there
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import ProfileForm from "@/components/ProfileForm";
 
-export default async function DashboardPage() {
+export default async function Dashboard() {
   const session = await getServerSession(authOptions);
+  if (!session) return <p>Please login</p>;
+
+  return (
+    <div className="p-6 max-w-2xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
+      <ProfileForm userId={session.user.id} />
+    </div>
+  );
+}
+
 
   // If user is not logged in
   if (!session) {
@@ -21,3 +31,4 @@ export default async function DashboardPage() {
     </div>
   );
 }
+
