@@ -1,0 +1,4 @@
+
+.input { @apply w-full border p-2 rounded-lg mb-3; }
+.btn-primary { @apply bg-purple-600 text-white p-2 rounded-lg; }
+.btn-google { @apply bg-red-500 text-white p-2 rounded-lg; }
