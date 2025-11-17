@@ -4,10 +4,7 @@ export default function DashboardLayout({ children }) {
       <aside className="w-64 bg-white shadow p-4">
         Dashboard Menu
       </aside>
-
-      <main className="flex-1 p-6">
-        {children}
-      </main>
+      <main className="flex-1 p-6">{children}</main>
     </div>
   );
 }
