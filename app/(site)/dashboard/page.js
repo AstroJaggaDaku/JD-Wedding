@@ -5,7 +5,6 @@ import ProfileForm from "@/components/ProfileForm";
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
-  // If user is not logged in
   if (!session) {
     return (
       <div className="p-6 max-w-2xl mx-auto text-center">
@@ -16,9 +15,8 @@ export default async function DashboardPage() {
     );
   }
 
-  // If user is logged in
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div>
       <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
       <ProfileForm userId={session.user.id} />
     </div>
