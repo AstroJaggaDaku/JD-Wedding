@@ -3,11 +3,11 @@ export const metadata = {
   description: "User Dashboard and Site Pages",
 };
 
-export default function SiteLayout({ children }) {
+export default function RootSiteLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-gray-50 min-h-screen font-sans">
-        <main className="container mx-auto p-4">{children}</main>
+        {children}
       </body>
     </html>
   );
