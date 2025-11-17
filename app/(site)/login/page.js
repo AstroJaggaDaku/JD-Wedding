@@ -1,33 +1,65 @@
-
 "use client";
-import { signIn } from "next-auth/react";
+
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  async function onSubmit(e) {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    await signIn("credentials", { email, password, callbackUrl: "/dashboard" });
-  }
+    setError("");
+
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false, // IMPORTANT!!!
+    });
+
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
+    // success
+    router.push("/dashboard");
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-purple-50">
-      <form onSubmit={onSubmit} className="bg-white p-8 shadow-xl rounded-xl w-96">
-        <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+    <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
 
-        <input className="input" placeholder="Email"
-          value={email} onChange={e => setEmail(e.target.value)} />
+      {error && <p className="text-red-600 mb-3 text-center">{error}</p>}
 
-        <input type="password" className="input" placeholder="Password"
-          value={password} onChange={e => setPassword(e.target.value)} />
+      <form className="space-y-4" onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full border p-2 rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <button className="btn-primary w-full mt-4">Login</button>
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full border p-2 rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-        <button type="button" className="btn-google w-full mt-2"
-          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}>
-          Login with Google
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
+          Login
         </button>
       </form>
     </div>
