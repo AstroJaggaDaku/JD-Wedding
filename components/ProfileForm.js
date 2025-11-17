@@ -25,10 +25,12 @@ export default function ProfileForm({ userId }) {
 
   useEffect(() => {
     if (!userId) return;
+
     async function fetchProfile() {
       try {
         const res = await fetch(`/api/profiles/get?id=${userId}`);
         if (!res.ok) throw new Error("Failed to fetch profile");
+
         const data = await res.json();
         setProfile(data);
         setImagePreview(data.image || "");
@@ -36,6 +38,7 @@ export default function ProfileForm({ userId }) {
         console.error(err);
       }
     }
+
     fetchProfile();
   }, [userId]);
 
@@ -50,19 +53,29 @@ export default function ProfileForm({ userId }) {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+    formData.append(
+      "upload_preset",
+      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+    );
 
     setLoading(true);
+
     try {
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
         { method: "POST", body: formData }
       );
+
       const data = await res.json();
-      setProfile((prev) => ({ ...prev, image: data.secure_url }));
-      setImagePreview(data.secure_url);
+
+      if (data.secure_url) {
+        setProfile((prev) => ({ ...prev, image: data.secure_url }));
+        setImagePreview(data.secure_url);
+      } else {
+        setMessage("Image upload failed");
+      }
     } catch (err) {
-      console.error("Image upload failed:", err);
+      console.error(err);
       setMessage("Image upload failed");
     } finally {
       setLoading(false);
@@ -73,17 +86,21 @@ export default function ProfileForm({ userId }) {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+
     try {
       const res = await fetch("/api/profiles/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...profile, userId }),
       });
+
       const data = await res.json();
+
       if (data.error) throw new Error(data.error);
+
       setMessage("Profile updated successfully!");
     } catch (err) {
-      console.error(err);
+      console.log(err);
       setMessage(err.message);
     } finally {
       setLoading(false);
@@ -93,7 +110,9 @@ export default function ProfileForm({ userId }) {
   return (
     <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">Edit Your Profile</h2>
-      {message && <p className="mb-4 text-sm text-red-600">{message}</p>}
+
+      {message && <p className="mb-4 text-red-600">{message}</p>}
+
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
@@ -105,6 +124,7 @@ export default function ProfileForm({ userId }) {
             className="input"
             required
           />
+
           <input
             type="number"
             name="age"
@@ -114,20 +134,91 @@ export default function ProfileForm({ userId }) {
             className="input"
             required
           />
-          <select name="gender" value={profile.gender} onChange={handleChange} className="input" required>
+
+          <select
+            name="gender"
+            value={profile.gender}
+            onChange={handleChange}
+            className="input"
+            required
+          >
             <option value="">Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
-          <input type="text" name="height" value={profile.height} onChange={handleChange} placeholder="Height" className="input" />
-          <input type="text" name="religion" value={profile.religion} onChange={handleChange} placeholder="Religion" className="input" />
-          <input type="text" name="caste" value={profile.caste} onChange={handleChange} placeholder="Caste" className="input" />
-          <input type="text" name="education" value={profile.education} onChange={handleChange} placeholder="Education" className="input" />
-          <input type="text" name="occupation" value={profile.occupation} onChange={handleChange} placeholder="Occupation" className="input" />
-          <input type="text" name="salary" value={profile.salary} onChange={handleChange} placeholder="Salary" className="input" />
-          <input type="text" name="city" value={profile.city} onChange={handleChange} placeholder="City" className="input" />
-          <input type="text" name="phone" value={profile.phone} onChange={handleChange} placeholder="Phone" className="input" />
+
+          <input
+            type="text"
+            name="height"
+            value={profile.height}
+            onChange={handleChange}
+            placeholder="Height"
+            className="input"
+          />
+
+          <input
+            type="text"
+            name="religion"
+            value={profile.religion}
+            onChange={handleChange}
+            placeholder="Religion"
+            className="input"
+          />
+
+          <input
+            type="text"
+            name="caste"
+            value={profile.caste}
+            onChange={handleChange}
+            placeholder="Caste"
+            className="input"
+          />
+
+          <input
+            type="text"
+            name="education"
+            value={profile.education}
+            onChange={handleChange}
+            placeholder="Education"
+            className="input"
+          />
+
+          <input
+            type="text"
+            name="occupation"
+            value={profile.occupation}
+            onChange={handleChange}
+            placeholder="Occupation"
+            className="input"
+          />
+
+          <input
+            type="text"
+            name="salary"
+            value={profile.salary}
+            onChange={handleChange}
+            placeholder="Salary"
+            className="input"
+          />
+
+          <input
+            type="text"
+            name="city"
+            value={profile.city}
+            onChange={handleChange}
+            placeholder="City"
+            className="input"
+          />
+
+          <input
+            type="text"
+            name="phone"
+            value={profile.phone}
+            onChange={handleChange}
+            placeholder="Phone"
+            className="input"
+          />
         </div>
 
         <textarea
@@ -135,9 +226,39 @@ export default function ProfileForm({ userId }) {
           value={profile.about}
           onChange={handleChange}
           placeholder="About"
-          className="input h-24 resize-none w-full"
-        />
+          className="input h-24 w-full resize-none"
+        ></textarea>
 
+        {/* Image Upload */}
         <div>
-          <label className="block mb-1 font-semibold">Profile Image</label>
-          <input type="file" acc
+          <label className="block font-semibold mb-1">
+            Profile Image
+          </label>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImage}
+            className="input"
+          />
+
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="w-32 h-32 mt-3 rounded object-cover border"
+            />
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+        >
+          {loading ? "Saving..." : "Save Profile"}
+        </button>
+      </form>
+    </div>
+  );
+}
